@@ -1,0 +1,42 @@
+name: release
+
+on:
+  #workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+env:
+  SUB_PROJECT_DIR: migration
+
+jobs:
+  release:
+    name: Release on JDK 8
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+          cache: gradle
+      - name: Build with Gradle
+        run: ./gradlew -Prelease.useLastTag=true publish
+      - name: Copy
+        run: |
+          dist_dir=./build/deploy
+          source0=./$SUB_PROJECT_DIR/build/mvn-repos/testing
+          source1=./$SUB_PROJECT_DIR/build/mvn-repos/stable
+          mkdir $dist_dir
+          for s in $source0 $source1; do
+            if test -e $s; then cp -rf $s/com $dist_dir/com; fi
+          done
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/deploy
+          keep_files: true
+          enable_jekyll: false

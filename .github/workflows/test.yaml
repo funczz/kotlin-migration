@@ -1,0 +1,26 @@
+name: test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/**
+      - develop
+      - release
+
+jobs:
+  test:
+    name: Test on JDK 8
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+          cache: gradle
+      - name: Test with Gradle
+        run: ./gradlew test

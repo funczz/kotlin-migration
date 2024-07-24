@@ -1,0 +1,23 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# generated code
+
+# other
+secure.*
+.iml
+.idea/*
+!.idea/gradle.xml
+!.idea/misc.xml
+.DS_Store
+.externalNativeBuild
+local.properties
+captures/
+out/
+target/
+.kotlintest/
+*.hprof
+*.log
