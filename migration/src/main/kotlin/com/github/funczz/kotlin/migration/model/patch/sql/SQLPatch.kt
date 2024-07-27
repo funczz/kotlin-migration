@@ -3,6 +3,7 @@ package com.github.funczz.kotlin.migration.model.patch.sql
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.util.*
 
 @Suppress("Unused", "MemberVisibilityCanBePrivate")
 open class SQLPatch(
@@ -59,10 +60,25 @@ open class SQLPatch(
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        other as SQLPatch
+        return getTag() == other.getTag() && up() == other.up() && down() == other.down()
+    }
+
+    override fun hashCode(): Int {
+        var result = 17
+        result = 31 * result + Objects.hashCode(getTag())
+        result = 31 * result + Objects.hashCode(up())
+        result = 31 * result + Objects.hashCode(down())
+        return result
+    }
+
     override fun toString(): String {
         return "%s(tag=%s)".format(
             this::class.simpleName,
-            tag,
+            getTag(),
         )
     }
 }
