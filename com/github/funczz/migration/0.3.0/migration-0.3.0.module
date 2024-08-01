@@ -1,0 +1,73 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.funczz",
+    "module": "migration",
+    "version": "0.3.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.1.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "migration-0.3.0.jar",
+          "url": "migration-0.3.0.jar",
+          "size": 43847,
+          "sha512": "a6ee6dd65cf1597505ac286a13ea24230a637f4131e1eb3e232ebdb35fe9c511182e9494d2cde971a0a9ca74cb9c493046c258ecef41279de854a04762e0c565",
+          "sha256": "4c0dc0c84ee5de7f710179d060d9af2724cc00537e44bd77c56b1afd3f6766e6",
+          "sha1": "0688a690f96db31da4884ef3e9b81a2041f3bea1",
+          "md5": "536e396a77e83db3e5e7e49dcc4f5953"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "migration-0.3.0.jar",
+          "url": "migration-0.3.0.jar",
+          "size": 43847,
+          "sha512": "a6ee6dd65cf1597505ac286a13ea24230a637f4131e1eb3e232ebdb35fe9c511182e9494d2cde971a0a9ca74cb9c493046c258ecef41279de854a04762e0c565",
+          "sha256": "4c0dc0c84ee5de7f710179d060d9af2724cc00537e44bd77c56b1afd3f6766e6",
+          "sha1": "0688a690f96db31da4884ef3e9b81a2041f3bea1",
+          "md5": "536e396a77e83db3e5e7e49dcc4f5953"
+        }
+      ]
+    }
+  ]
+}
