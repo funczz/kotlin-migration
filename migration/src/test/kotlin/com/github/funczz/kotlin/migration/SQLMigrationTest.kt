@@ -194,9 +194,21 @@ class SQLMigrationTest : SQLConnectionExt {
         tag = "",
     )
 
+    private val patchT1 = SQLPatch(
+        up = "CREATE TRIGGER TRIGGER_PATCH1 BEFORE UPDATE ON PATCH1 REFERENCING NEW AS new_row FOR EACH ROW SET new_row.name = '';",
+        down = "DROP TRIGGER TRIGGER_PATCH1",
+        tag = "",
+    )
+
     private val patch2 = SQLPatch(
         up = "CREATE TABLE PATCH2 (ID INT PRIMARY KEY NOT NULL, NAME VARCHAR(100) NOT NULL)",
         down = "DROP TABLE PATCH2",
+        tag = "",
+    )
+
+    private val patchT2 = SQLPatch(
+        up = "CREATE TRIGGER TRIGGER_PATCH2 BEFORE UPDATE ON PATCH2 REFERENCING NEW AS new_row FOR EACH ROW SET new_row.name = '';",
+        down = "DROP TRIGGER TRIGGER_PATCH2",
         tag = "",
     )
 
@@ -206,11 +218,24 @@ class SQLMigrationTest : SQLConnectionExt {
         tag = "tag1",
     )
 
+    private val patchT3 = SQLPatch(
+        up = "CREATE TRIGGER TRIGGER_PATCH3 BEFORE UPDATE ON PATCH3 REFERENCING NEW AS new_row FOR EACH ROW SET new_row.name = '';",
+        down = "DROP TRIGGER TRIGGER_PATCH3",
+        tag = "tag1",
+    )
+
     private val patch4 = SQLPatch(
         up = "CREATE TABLE PATCH4 (ID INT PRIMARY KEY NOT NULL, NAME VARCHAR(100) NOT NULL)",
         down = "DROP TABLE PATCH4",
         tag = "",
     )
+
+    private val patchT4 = SQLPatch(
+        up = "CREATE TRIGGER TRIGGER_PATCH4 BEFORE UPDATE ON PATCH4 REFERENCING NEW AS new_row FOR EACH ROW SET new_row.name = '';",
+        down = "DROP TRIGGER TRIGGER_PATCH4",
+        tag = "",
+    )
+
 
     private val patch5 = SQLPatch(
         up = "CREATE TABLE PATCH5 (ID INT PRIMARY KEY NOT NULL, NAME VARCHAR(100) NOT NULL)",
@@ -218,21 +243,32 @@ class SQLMigrationTest : SQLConnectionExt {
         tag = "",
     )
 
+    private val patchT5 = SQLPatch(
+        up = "CREATE TRIGGER TRIGGER_PATCH5 BEFORE UPDATE ON PATCH5 REFERENCING NEW AS new_row FOR EACH ROW SET new_row.name = '';",
+        down = "DROP TRIGGER TRIGGER_PATCH5",
+        tag = "",
+    )
+
     private val version1 = Version(
         versionId = "1.0.0",
         patch1,
+        patchT1,
         patch2,
+        patchT2,
     )
 
     private val version2 = Version(
         versionId = "2.0.0",
         patch3,
+        patchT3,
         patch4,
+        patchT4,
     )
 
     private val version3 = Version(
         versionId = "3.0.0",
         patch5,
+        patchT5,
     )
 
     private val module1 = Module(

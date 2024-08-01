@@ -138,7 +138,7 @@ open class SQLMigration(
             it.getVersionId() == currentVersionId
         }
         val version = versions[versionIndex]
-        for (patch in version.getPatches()) {
+        for (patch in version.getPatches().reversed()) { //migrateと逆順でrollbackを適用する
             patch.rollback(
                 moduleId = module.getModuleId(),
                 versionId = version.getVersionId(),
