@@ -57,7 +57,11 @@ open class SQLMigration(
     }
 
     override fun initialize() = commit { connection ->
-        versionManager.initialize(context = newContext(connection = connection))
+        try {
+            versionManager.initialize(context = newContext(connection = connection))
+        } catch (th: Throwable) {
+            throw IllegalVersionException("Could not initialize version manager.", cause = th)
+        }
     }
 
     override fun migrate() {
@@ -79,20 +83,31 @@ open class SQLMigration(
         val versions = module.getVersions()
 
         if (versions.isEmpty()) return@commit //Version が未登録なら何もしない
-        require(versions.any { it.getVersionId() == versionId }) //versionId と同値の Version がなければ例外エラー
 
-        val currentVersionId = versionManager.getCurrentVersionId(context = context)
-        require(
-            currentVersionId.isBlank() || versions.any { it.getVersionId() == currentVersionId }
-        ) //currentVersionId と同値の Version がなければ例外エラー
+        if (!(versions.any { it.getVersionId() == versionId })) {
+            throw IllegalVersionException(
+                "Module does not contain requested version id: requested version id=`$versionId`"
+            )
+        } //versionId と同値の Version がなければ例外エラー
+
+        val currentVersionId = getCurrentVersionId(connection = connection)
+
+        if (!(currentVersionId.isBlank() || versions.any { it.getVersionId() == currentVersionId })) {
+            throw IllegalVersionException(
+                "Module does not contain current version id: current version id=`$currentVersionId`"
+            )
+        } //currentVersionId と同値の Version がなければ例外エラー
 
         if (versions.last().getVersionId() == currentVersionId) {
             return@commit
         } //Version が全て適用済みなら何もしない
 
-        val versionIdIndex = module.getVersions().indexOfFirst { it.getVersionId() == versionId }
-        val currentVersionIdIndex =
-            module.getVersions().indexOfFirst { it.getVersionId() == currentVersionId }
+        val versionIdIndex = module.getVersions().indexOfFirst {
+            it.getVersionId() == versionId
+        }
+        val currentVersionIdIndex = module.getVersions().indexOfFirst {
+            it.getVersionId() == currentVersionId
+        }
         if (versionIdIndex <= currentVersionIdIndex) return@commit //versionId と同値の Version が適用済みなら何もしない
 
         val startVersionIndex = when {
@@ -109,10 +124,7 @@ open class SQLMigration(
                     context = context
                 )
             }
-            versionManager.setCurrentVersionId(
-                versionId = version.getVersionId(),
-                context = context
-            )
+            setCurrentVersionId(versionId = version.getVersionId(), connection = connection)
             connection.commit() //バージョン毎に結果をコミットする
             if (version.getVersionId() == versionId) break //適用した Version が versionID と同値なら適用を終える
         }
@@ -128,11 +140,15 @@ open class SQLMigration(
 
         if (versions.isEmpty()) return@commit //Version が未登録なら何もしない
 
-        val currentVersionId = versionManager.getCurrentVersionId(
-            context = context
-        )
+        val currentVersionId = getCurrentVersionId(connection = connection)
+
         if (currentVersionId.isBlank()) return@commit //currentVersionId がブランクなら全て未適用なので何もしない
-        require(versions.any { it.getVersionId() == currentVersionId }) //currentVersionId と同値の Version がなければ例外エラー
+
+        if (!(versions.any { it.getVersionId() == currentVersionId })) {
+            throw IllegalVersionException(
+                "Module does not contain current version id: current version id=`$currentVersionId`"
+            )
+        } //currentVersionId と同値の Version がなければ例外エラー
 
         val versionIndex = module.getVersions().indexOfLast {
             it.getVersionId() == currentVersionId
@@ -150,14 +166,34 @@ open class SQLMigration(
             versionIndex == 0 -> ""
             else -> versions[versionIndex - 1].getVersionId()
         }
-        versionManager.setCurrentVersionId(
-            versionId = newCurrentVersionId,
-            context = context
-        )
+        setCurrentVersionId(versionId = newCurrentVersionId, connection = connection)
     }
 
-    override fun getCurrentVersionId(): String = commit { connection ->
-        versionManager.getCurrentVersionId(context = newContext(connection = connection))
+    override fun getCurrentVersionId(): String {
+        val connection = connector()
+        return getCurrentVersionId(connection = connection)
+    }
+
+    private fun getCurrentVersionId(connection: Connection): String {
+        return try {
+            versionManager.getCurrentVersionId(context = newContext(connection = connection))
+        } catch (th: Throwable) {
+            throw IllegalVersionException(
+                "Could not retrieve current version id.",
+                cause = th
+            )
+        }
+    }
+
+    private fun setCurrentVersionId(versionId: String, connection: Connection) {
+        return try {
+            versionManager.setCurrentVersionId(versionId = versionId, newContext(connection = connection))
+        } catch (th: Throwable) {
+            throw IllegalVersionException(
+                "Could not save current version id: current version id=`$versionId`",
+                cause = th
+            )
+        }
     }
 
     private fun newContext(connection: Connection): Map<String, Any> {
@@ -169,4 +205,6 @@ open class SQLMigration(
     companion object {
         const val CONNECTION: String = "SQLMigration.context.connection"
     }
+
+    class IllegalVersionException(message: String, cause: Throwable? = null) : Exception(message, cause)
 }
