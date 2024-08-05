@@ -13,7 +13,7 @@ import java.sql.DriverManager
 import java.sql.SQLSyntaxErrorException
 
 @Suppress("NonAsciiCharacters")
-class SQLMigrationFalureTest {
+class SQLMigrationFailureTest {
 
     @Test
     fun `migrate の呼び出しでエラーが発生する`() {
