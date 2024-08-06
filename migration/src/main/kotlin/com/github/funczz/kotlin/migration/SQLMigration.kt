@@ -169,9 +169,8 @@ open class SQLMigration(
         setCurrentVersionId(versionId = newCurrentVersionId, connection = connection)
     }
 
-    override fun getCurrentVersionId(): String {
-        val connection = connector()
-        return getCurrentVersionId(connection = connection)
+    override fun getCurrentVersionId(): String = commit { connection ->
+        getCurrentVersionId(connection = connection)
     }
 
     private fun getCurrentVersionId(connection: Connection): String {
