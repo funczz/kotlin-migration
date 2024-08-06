@@ -185,7 +185,7 @@ open class SQLMigration(
     }
 
     private fun setCurrentVersionId(versionId: String, context: Map<String, Any>) {
-        return try {
+        try {
             versionManager.setCurrentVersionId(versionId = versionId, context = context)
         } catch (th: Throwable) {
             throw IllegalVersionException(
