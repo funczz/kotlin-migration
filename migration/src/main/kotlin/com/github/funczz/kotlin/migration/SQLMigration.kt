@@ -90,7 +90,7 @@ open class SQLMigration(
             )
         } //versionId と同値の Version がなければ例外エラー
 
-        val currentVersionId = getCurrentVersionId(connection = connection)
+        val currentVersionId = getCurrentVersionId(context = context)
 
         if (!(currentVersionId.isBlank() || versions.any { it.getVersionId() == currentVersionId })) {
             throw IllegalVersionException(
@@ -124,7 +124,7 @@ open class SQLMigration(
                     context = context
                 )
             }
-            setCurrentVersionId(versionId = version.getVersionId(), connection = connection)
+            setCurrentVersionId(versionId = version.getVersionId(), context = context)
             connection.commit() //バージョン毎に結果をコミットする
             if (version.getVersionId() == versionId) break //適用した Version が versionID と同値なら適用を終える
         }
@@ -140,7 +140,7 @@ open class SQLMigration(
 
         if (versions.isEmpty()) return@commit //Version が未登録なら何もしない
 
-        val currentVersionId = getCurrentVersionId(connection = connection)
+        val currentVersionId = getCurrentVersionId(context = context)
 
         if (currentVersionId.isBlank()) return@commit //currentVersionId がブランクなら全て未適用なので何もしない
 
@@ -166,16 +166,16 @@ open class SQLMigration(
             versionIndex == 0 -> ""
             else -> versions[versionIndex - 1].getVersionId()
         }
-        setCurrentVersionId(versionId = newCurrentVersionId, connection = connection)
+        setCurrentVersionId(versionId = newCurrentVersionId, context = context)
     }
 
     override fun getCurrentVersionId(): String = commit { connection ->
-        getCurrentVersionId(connection = connection)
+        getCurrentVersionId(context = newContext(connection = connection))
     }
 
-    private fun getCurrentVersionId(connection: Connection): String {
+    private fun getCurrentVersionId(context: Map<String, Any>): String {
         return try {
-            versionManager.getCurrentVersionId(context = newContext(connection = connection))
+            versionManager.getCurrentVersionId(context = context)
         } catch (th: Throwable) {
             throw IllegalVersionException(
                 "Could not retrieve current version id.",
@@ -184,9 +184,9 @@ open class SQLMigration(
         }
     }
 
-    private fun setCurrentVersionId(versionId: String, connection: Connection) {
+    private fun setCurrentVersionId(versionId: String, context: Map<String, Any>) {
         return try {
-            versionManager.setCurrentVersionId(versionId = versionId, newContext(connection = connection))
+            versionManager.setCurrentVersionId(versionId = versionId, context = context)
         } catch (th: Throwable) {
             throw IllegalVersionException(
                 "Could not save current version id: current version id=`$versionId`",
