@@ -205,5 +205,9 @@ open class SQLMigration(
         const val CONNECTION: String = "SQLMigration.context.connection"
     }
 
-    class IllegalVersionException(message: String, cause: Throwable? = null) : Exception(message, cause)
+    class IllegalVersionException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+        companion object {
+            private const val serialVersionUID: Long = 4504669497268338744L
+        }
+    }
 }
